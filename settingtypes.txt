@@ -1,0 +1,1 @@
+moon_phases_cycle (Change moon phase every X days) int 4
