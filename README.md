@@ -35,4 +35,4 @@ You can find a copy of that license in the repository.
 ## Media
 All included moon textures are resized versions of graphics from *NASA's Scientific Visualization Studio*.
 These images are part of the Public Domain.
-You can access the entire (high resolution) album on [their website](https://svs.gsfc.nasa.gov/4769#28564).
+You can access the entire (high resolution) album on [their website](https://svs.gsfc.nasa.gov/4769#28564). See [NASA's media guidelines](https://www.nasa.gov/multimedia/guidelines/index.html) for more information on licensing.
