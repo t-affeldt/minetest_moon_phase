@@ -15,7 +15,7 @@ minetest.register_chatcommand("moonphase", {
 minetest.register_chatcommand("set_moonphase", {
 	params = "<phase>",
 	description = "Set moon phase to given value",
-	privs = {moonphase = true},
+	privs = { moonphase = true },
 	func = function(playername, param)
 		if param == nil or param == "" then
 			minetest.chat_send_player(playername, "Provide a number between 1 and 8")

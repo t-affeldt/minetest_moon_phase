@@ -1,3 +1,0 @@
-Changes the moon to follow a cycle between eight different phases.
-Expect the sky to change every four nights (or configure a custom schedule).
-Requires at least Minetest 5.2.0
