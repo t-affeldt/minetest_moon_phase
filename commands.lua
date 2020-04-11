@@ -29,3 +29,21 @@ minetest.register_chatcommand("set_moonphase", {
 		end
 	end
 })
+
+minetest.register_chatcommand("set_moonstyle", {
+	params = "<style>",
+	description = "Set your moon's texture style to the given preset",
+	func = function(playername, param)
+		if param == nil or param == "" then
+			minetest.chat_send_player(playername, "Provide a texture style. Possible styles are classic or realistic")
+		else
+			local player = minetest.get_player_by_name(playername)
+			local change = moon_phases.set_style(player, param)
+			if change then
+				minetest.chat_send_player(playername, "Moon texture changed successfully")
+			else
+				minetest.chat_send_player(playername, "Invalid argument. Provide a valid preset.")
+			end
+		end
+	end
+})

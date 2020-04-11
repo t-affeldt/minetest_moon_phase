@@ -1,1 +1,2 @@
 moon_phases_cycle (Change moon phase every X days) int 4
+moon_phases_style (Choose a default texture style) enum classic classic,realistic

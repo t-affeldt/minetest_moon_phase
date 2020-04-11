@@ -16,22 +16,19 @@ if not state:contains("day") then
 	})
 end
 
--- retrieve and parse mod configuration
-local function get_cycle_config()
-	local config = minetest.settings:get("moon_phases_cycle") or DEFAULT_LENGTH
-	config = math.floor(tonumber(config))
-	if (not config) or config < 0 then
-		minetest.log("warning", "[Moon Phases] Invalid cycle configuration")
-		return DEFAULT_LENGTH
-	end
-	return config
-end
+-- retrieve mod configuration
+local PHASE_LENGTH = minetest.settings:get("moon_phases_cycle") or DEFAULT_LENGTH
+local TEXTURE_STYLE = minetest.settings:get("moon_phases_style") or DEFAULT_STYLE
 
-local PHASE_LENGTH = get_cycle_config()
-
--- set the moon texture of a player to the given texture
-local function set_texture(player, texture)
+-- set the moon texture of a player to the given phase
+local function set_texture(player, phase)
 	local sl = {}
+	local meta_data = player:get_meta()
+	local style = meta_data:get_string("moon_phases:texture_style")
+	if style ~= "classic" and style ~= "realistic" then
+		style = TEXTURE_STYLE
+	end
+	local texture = "moon_" .. phase .. "_" .. style .. ".png"
 	sl.name = "moon_phases:custom"
 	sl.moon_data = {
 		visible = true,
@@ -49,7 +46,7 @@ end
 local function update_textures()
 	local phase = state:get_int("phase")
 	for _, player in ipairs(minetest.get_connected_players()) do
-		set_texture(player, "moon_" .. phase .. ".png")
+		set_texture(player, phase)
 	end
 end
 
@@ -89,12 +86,23 @@ function moon_phases.set_phase(phase)
 	return true
 end
 
+-- set the moon's texture style for the given player
+function moon_phases.set_style(player, style)
+	if style ~= "classic" and style ~= "realistic" then
+		return false
+	end
+	local meta_data = player:get_meta()
+	meta_data:set_string("moon_phases:texture_style", style)
+	set_texture(player, state:get_int("phase"))
+	return true
+end
+
 -- set the moon texture of newly joined player
 minetest.register_on_joinplayer(function(player)
 	local phase = state:get_int("phase")
 	-- phase might not have been set at server start
 	if phase < 1 then phase = 1 end
-	set_texture(player, "moon_" .. phase .. ".png")
+	set_texture(player, phase)
 end)
 
 -- check for day changes and call handlers
