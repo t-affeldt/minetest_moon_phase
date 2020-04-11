@@ -1,5 +1,5 @@
 # Moon phases
-Make your sky change follow a cycle
+Make your moon follow a realistic cycle
 
 __Important__: This mod requires at least Minetest 5.2.0 for the game's new sky API.
 Make sure you have the latest version installed or [update your game](https://www.minetest.net/downloads/).
@@ -33,6 +33,6 @@ All source code is licensed under GNU LESSER GENERAL PUBLIC LICENSE version 3.
 You can find a copy of that license in the repository.
 
 ## Media
-All included moon textures are resized versions of graphics from *NASA's Scientific Visualization Studio*.
-These images are part of the Public Domain.
+All included moon textures are resized versions of graphics from *NASA's Scientific Visualization Studio* by [Ernie Wright](https://svs.gsfc.nasa.gov/cgi-bin/search.cgi?person=1059).
+These images are part of the Public Domain as CC-BY-SA 3.0.
 You can access the entire (high resolution) album on [their website](https://svs.gsfc.nasa.gov/4769#28564). See [NASA's media guidelines](https://www.nasa.gov/multimedia/guidelines/index.html) for more information on licensing.

@@ -18,9 +18,6 @@ local function get_cycle_config()
 end
 
 local PHASE_LENGTH = get_cycle_config()
-if state.day >= PHASE_LENGTH then
-	state.day = 1
-end
 
 local function set_texture(player, texture)
 	local sl = {}
@@ -46,8 +43,7 @@ local function handle_time_progression()
 	local time = minetest.get_timeofday()
 	if time >= 0.5 and state.change_time then
 		state.day = state.day + 1
-		if state.day == PHASE_LENGTH then
-			state.day = 1
+		if state.day % PHASE_LENGTH == 0 then
 			state.phase = (state.phase % 8) + 1
 			state.change_time = false
 			update_textures()
