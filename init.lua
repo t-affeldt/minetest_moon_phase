@@ -2,9 +2,9 @@ local mod_skylayer = minetest.get_modpath("skylayer") ~= nil
 
 local modpath = minetest.get_modpath("moon_phases");
 
-local GSCYCLE = 0.5							-- global step cycle
-local DEFAULT_LENGTH = 4				-- default cycle length
-local DEFAULT_STYLE = "classic"	-- default texture style
+local GSCYCLE = 0.5								-- global step cycle
+local DEFAULT_LENGTH = 4					-- default cycle length
+local DEFAULT_STYLE = "realistic"	-- default texture style
 
 moon_phases = {}
 local state = minetest.get_mod_storage()

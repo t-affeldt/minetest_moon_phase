@@ -24,6 +24,8 @@ Use ``/grant <player> moonphase`` to grant it.
 Just like the chat commands, this mod provides a LUA api for accessing the moon phase.
 It contains a method called ``moon_phases.get_phase()`` that will return a numeric value representing the current moon phase.
 You can also set the phase via ``moon_phases.set_phase(phase)`` where ``phase`` is an integer between 1 and 8.
+The texture style of a specific player can be set with ``moon_phases.set_style(player, style)`` where ``style`` referes to either
+``classic`` or ``realistic``.
 
 ## Configuration
 The mod provides the option to change the length of the moon cycle.
