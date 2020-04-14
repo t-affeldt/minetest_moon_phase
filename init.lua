@@ -9,11 +9,11 @@ local DEFAULT_STYLE = "realistic"	-- default texture style
 moon_phases = {}
 local state = minetest.get_mod_storage()
 if not state:contains("day") then
-	state:from_table({
+	state:from_table({fields = {
 		day = 1,
 		phase = 1,
 		change_time = 1
-	})
+	}})
 end
 
 -- retrieve mod configuration
@@ -100,8 +100,6 @@ end
 -- set the moon texture of newly joined player
 minetest.register_on_joinplayer(function(player)
 	local phase = state:get_int("phase")
-	-- phase might not have been set at server start
-	if phase < 1 then phase = 1 end
 	set_texture(player, phase)
 end)
 
