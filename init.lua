@@ -1,96 +1,132 @@
+local mod_climate_api = minetest.get_modpath("climate_api") ~= nil
 local mod_skylayer = minetest.get_modpath("skylayer") ~= nil
 
 local modpath = minetest.get_modpath("moon_phases");
 
 local GSCYCLE = 0.5								-- global step cycle
 local DEFAULT_LENGTH = 4					-- default cycle length
-local DEFAULT_STYLE = "realistic"	-- default texture style
+local DEFAULT_STYLE = "classic"		-- default texture style
+local PHASE_COUNT = 8							-- number of phases to go through
+
+-- retrieve mod configuration
+local PHASE_LENGTH = 4--minetest.settings:get("moon_phases_cycle") or DEFAULT_LENGTH
+local TEXTURE_STYLE = minetest.settings:get("moon_phases_style") or DEFAULT_STYLE
+
+local sky_color = {
+	"#1d293aff",
+	"#1c4b8dff",
+	nil,
+	"#579dffff",
+	nil,
+	"#1c4b8dff",
+	"#1d293aff",
+	"#000000ff"
+}
+
+local horizon_color = {
+	"#243347ff",
+	"#235fb3ff",
+	nil,
+	"#73aeffff",
+	nil,
+	"#3079dfff",
+	"#173154ff",
+	"#000000ff"
+}
 
 moon_phases = {}
 local state = minetest.get_mod_storage()
-if not state:contains("day") then
-	state:from_table({fields = {
-		day = 1,
-		phase = 1,
-		change_time = 1
-	}})
+
+-- calculate current moon phase from date
+-- and stored date offset
+local function calculate_phase()
+	local time = minetest.get_timeofday()
+	local day = minetest.get_day_count() + state:get_int("date_offset")
+	if time > 0.5 then
+		day = day + 1
+	end
+	return ((math.ceil(day / PHASE_LENGTH) - 1) % PHASE_COUNT) + 1
 end
 
--- retrieve mod configuration
-local PHASE_LENGTH = minetest.settings:get("moon_phases_cycle") or DEFAULT_LENGTH
-local TEXTURE_STYLE = minetest.settings:get("moon_phases_style") or DEFAULT_STYLE
+local phase = 1
+
+-- return the current moon phase
+function moon_phases.get_phase()
+	return phase
+end
 
 -- set the moon texture of a player to the given phase
 local function set_texture(player, phase)
-	local sl = {}
+	if not player.get_stars then return end -- check for new sky API
 	local meta_data = player:get_meta()
 	local style = meta_data:get_string("moon_phases:texture_style")
 	if style ~= "classic" and style ~= "realistic" then
 		style = TEXTURE_STYLE
 	end
 	local texture = "moon_" .. phase .. "_" .. style .. ".png"
-	sl.name = "moon_phases:custom"
-	sl.moon_data = {
+	local name = "moon_phases:cycle"
+	local sky = {}
+	sky.sky_data = {
+		type = "regular",
+		sky_color = {
+			night_sky = sky_color[phase],
+			night_horizon = horizon_color[phase]
+		}
+	}
+	sky.moon_data = {
 		visible = true,
 		texture = texture,
 		scale = 0.8
 	}
-	if mod_skylayer then
-		skylayer.add_layer(player:get_player_name(), sl)
+	local playername = player:get_player_name()
+	if mod_climate_api then
+		sky.priority = 0
+		climate_api.skybox.add_layer(playername, name, sky)
+	elseif mod_skylayer then
+		sky.name = name
+		skylayer.add_layer(playername, sky)
 	else
-		player:set_moon(sl.moon_data)
-	end
-end
-
--- update moon textures of all online players
-local function update_textures()
-	local phase = state:get_int("phase")
-	for _, player in ipairs(minetest.get_connected_players()) do
-		set_texture(player, phase)
+		player:set_sky(sky.sky_data)
+		player:set_moon(sky.moon_data)
 	end
 end
 
 -- check for day changes
 local function handle_time_progression()
-	local time = minetest.get_timeofday()
-	local day = state:get_int("day")
-	local phase = state:get_int("phase")
-	local change_time = state:get_int("change_time") == 1
-	if time >= 0.5 and change_time then
-		day = day + 1
-		state:set_int("day", day)
-		if day % PHASE_LENGTH == 0 then
-			state:set_int("phase", (phase % 8) + 1)
-			state:set_int("change_time", 0)
-			update_textures()
+	local n_phase = calculate_phase()
+	if n_phase ~= phase then
+		phase = n_phase
+		minetest.log(dump2(phase, "htp: phase"))
+		minetest.log(dump2(n_phase, "htp: n_phase"))
+		for _, player in ipairs(minetest.get_connected_players()) do
+			set_texture(player, phase)
 		end
-	elseif time < 0.5 and not change_time then
-		state:set_int("change_time", 1)
 	end
-end
-
--- return the current moon phase
-function moon_phases.get_phase()
-	return state:get_int("phase")
 end
 
 -- set the current moon phase
--- @param phase int Phase between 1 and 8
-function moon_phases.set_phase(phase)
-	phase = math.floor(tonumber(phase))
-	if (not phase) or phase < 1 or phase > 8 then
+-- @param phase int Phase between 1 and PHASE_COUNT
+function moon_phases.set_phase(nphase)
+	nphase = math.floor(tonumber(nphase))
+	if (not nphase) or nphase < 1 or nphase > PHASE_COUNT then
 		return false
 	end
-	state:set_int("phase", phase)
-	update_textures()
+	local day = minetest.get_day_count()
+	local date_offset = state:get_int("date_offset")
+	local progress = (day + date_offset) % PHASE_LENGTH
+	local phase_offset = (nphase - phase + PHASE_COUNT) % PHASE_COUNT
+	local add_offset = ((phase_offset * PHASE_LENGTH) + date_offset - progress)
+	state:set_int("date_offset", add_offset)
+	handle_time_progression()
 	return true
 end
 
 -- set the moon's texture style for the given player
 function moon_phases.set_style(player, style)
-	if style ~= "classic" and style ~= "realistic" then
+	if style ~= nil and style ~= "classic" and style ~= "realistic" then
 		return false
 	end
+	--if style == DEFAULT_STYLE then style = nil end
 	local meta_data = player:get_meta()
 	meta_data:set_string("moon_phases:texture_style", style)
 	set_texture(player, state:get_int("phase"))
@@ -99,12 +135,11 @@ end
 
 -- set the moon texture of newly joined player
 minetest.register_on_joinplayer(function(player)
-	local phase = state:get_int("phase")
 	set_texture(player, phase)
 end)
 
 -- check for day changes and call handlers
-local timer = 0
+local timer = math.huge
 minetest.register_globalstep(function(dtime)
 	timer = timer + dtime
 	if timer < GSCYCLE then return end

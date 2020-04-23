@@ -6,9 +6,7 @@ Make sure you have the latest version installed or [update your game](https://ww
 
 ## Dependencies
 This mod has no hard dependencies whatsoever, so you can use it as you will.
-However, I do recommend using the [skylayer](https://gitlab.com/rautars/skylayer) mod.
-With the Minetest's new sky API it is likely for more mods to change the sky configuration,
-possibly resulting in conflict. This utility mod can help circumvent these issues if both mods use it.
+If you are also using *climate_api* then it will use the included skybox registration instead of overriding the player configuration. Thus, moon_phases will will be compatible with your weather packs.
 
 ## Commands
 This mod comes with two commands to print or change the current moon phase.
