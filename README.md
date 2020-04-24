@@ -8,6 +8,12 @@ Make sure you have the latest version installed or [update your game](https://ww
 This mod has no hard dependencies whatsoever, so you can use it as you will.
 If you are also using *climate_api* then it will use the included skybox registration instead of overriding the player configuration. Thus, moon_phases will will be compatible with your weather packs.
 
+## Changes in v2.0
+- New classic moon textures!
+- Skybox changes. The sky will brighten up during a full moon and turn dark during a new moon.
+- Less stored data: Moon cycle now used Minetest's ``get_day_count()`` and only stores a date offset when changed via commands.
+- Climate API integration. Use moon phases with your favorite weather mod
+
 ## Commands
 This mod comes with two commands to print or change the current moon phase.
 - Use ``/moonphase`` to view the currently active phase.
@@ -33,12 +39,12 @@ This results in a total cycle of 32 days.
 You can also set the default texture style for all players. You can choose between the same options as with the ``/set_moonstyle`` command.
 
 ## LICENSE
-All source code is licensed under GNU LESSER GENERAL PUBLIC LICENSE version 3.
+All source code is written by me and licensed under GNU LESSER GENERAL PUBLIC LICENSE version 3.
 You can find a copy of that license in the repository.
 
 ## Media
-All moon textures marked as "classic" are made by me. You can use them under a CC0 license.
+All moon textures marked as "classic" are made by Cap for this mod and usable under a *CC BY-SA (3.0)* license.
 
 All included "realistic" moon textures are resized versions of graphics from *NASA's Scientific Visualization Studio* by [Ernie Wright](https://svs.gsfc.nasa.gov/cgi-bin/search.cgi?person=1059).
-These images are part of the Public Domain as CC-BY-SA 3.0.
+These images are part of the Public Domain as *CC BY-SA 3.0*.
 You can access the entire (high resolution) album on [their website](https://svs.gsfc.nasa.gov/4769#28564). See [NASA's media guidelines](https://www.nasa.gov/multimedia/guidelines/index.html) for more information on licensing.
