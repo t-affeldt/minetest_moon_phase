@@ -96,8 +96,6 @@ local function handle_time_progression()
 	local n_phase = calculate_phase()
 	if n_phase ~= phase then
 		phase = n_phase
-		minetest.log(dump2(phase, "htp: phase"))
-		minetest.log(dump2(n_phase, "htp: n_phase"))
 		for _, player in ipairs(minetest.get_connected_players()) do
 			set_texture(player, phase)
 		end
