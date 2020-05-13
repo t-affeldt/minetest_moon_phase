@@ -3,13 +3,13 @@ local mod_skylayer = minetest.get_modpath("skylayer") ~= nil
 
 local modpath = minetest.get_modpath("moon_phases");
 
-local GSCYCLE = 0.5								-- global step cycle
-local DEFAULT_LENGTH = 4					-- default cycle length
+local GSCYCLE = 0.5								-- global step cycle in seconds
+local DEFAULT_LENGTH = 4					-- default moon cycle length in days
 local DEFAULT_STYLE = "classic"		-- default texture style
 local PHASE_COUNT = 8							-- number of phases to go through
 
 -- retrieve mod configuration
-local PHASE_LENGTH = 4--minetest.settings:get("moon_phases_cycle") or DEFAULT_LENGTH
+local PHASE_LENGTH = tonumber(minetest.settings:get("moon_phases_cycle") or DEFAULT_LENGTH)
 local TEXTURE_STYLE = minetest.settings:get("moon_phases_style") or DEFAULT_STYLE
 
 local sky_color = {
@@ -35,6 +35,7 @@ local horizon_color = {
 }
 
 moon_phases = {}
+local phase = 1
 local state = minetest.get_mod_storage()
 
 -- calculate current moon phase from date
@@ -47,8 +48,6 @@ local function calculate_phase()
 	end
 	return ((math.ceil(day / PHASE_LENGTH) - 1) % PHASE_COUNT) + 1
 end
-
-local phase = 1
 
 -- return the current moon phase
 function moon_phases.get_phase()
@@ -81,7 +80,7 @@ local function set_texture(player, phase)
 	local playername = player:get_player_name()
 	if mod_climate_api then
 		sky.priority = 0
-		climate_api.skybox.add_layer(playername, name, sky)
+		climate_api.skybox.add(playername, name, sky)
 	elseif mod_skylayer then
 		sky.name = name
 		skylayer.add_layer(playername, sky)
@@ -124,7 +123,6 @@ function moon_phases.set_style(player, style)
 	if style ~= nil and style ~= "classic" and style ~= "realistic" then
 		return false
 	end
-	--if style == DEFAULT_STYLE then style = nil end
 	local meta_data = player:get_meta()
 	meta_data:set_string("moon_phases:texture_style", style)
 	set_texture(player, state:get_int("phase"))
@@ -144,6 +142,11 @@ minetest.register_globalstep(function(dtime)
 	handle_time_progression()
 	timer = 0
 end)
+
+-- make moon phase available to weather effects
+if mod_climate_api then
+	climate_api.register_global_influence("moonphase", moon_phases.get_phase)
+end
 
 -- include API for chat commands
 dofile(modpath .. "/commands.lua")
